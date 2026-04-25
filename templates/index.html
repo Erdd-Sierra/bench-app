@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bench Map Tokyo</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='icons/favicon.svg') }}">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+
+    <!-- Leaflet MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+
+    <!-- App CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header__brand">
+            <img src="{{ url_for('static', filename='icons/favicon.svg') }}" alt="" class="header__icon">
+            <h1 class="header__title">Bench Map Tokyo</h1>
+        </div>
+
+        <!-- Search bar -->
+        <div class="header__search" id="search-container">
+            <svg class="header__search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" class="header__search-input" id="search-input" placeholder="Search a place..." autocomplete="off">
+            <ul class="search-results" id="search-results" style="display:none;"></ul>
+        </div>
+
+        <div class="header__actions">
+            <button class="btn btn--add" id="add-bench-btn" title="Report a new bench">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                <span class="btn__label">Add Bench</span>
+            </button>
+            <button class="btn btn--locate" id="locate-btn" title="Find my location">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"/>
+                    <line x1="12" y1="2" x2="12" y2="6"/>
+                    <line x1="12" y1="18" x2="12" y2="22"/>
+                    <line x1="2" y1="12" x2="6" y2="12"/>
+                    <line x1="18" y1="12" x2="22" y2="12"/>
+                </svg>
+                <span class="btn__label">Locate Me</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="main">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar__handle" id="sidebar-handle">
+                <span class="sidebar__handle-bar"></span>
+            </div>
+
+            <div class="sidebar__content">
+                <!-- Loading state -->
+                <div class="sidebar__loading" id="sidebar-loading">
+                    <div class="spinner"></div>
+                    <p>Loading benches...</p>
+                </div>
+
+                <!-- Nearest benches section -->
+                <section class="sidebar__section" id="nearest-section" style="display:none;">
+                    <h2 class="sidebar__heading">Nearest Benches</h2>
+                    <ul class="bench-list" id="bench-list">
+                        <!-- Populated by JS -->
+                    </ul>
+                </section>
+
+                <!-- Stats section -->
+                <section class="sidebar__section" id="stats-section" style="display:none;">
+                    <h2 class="sidebar__heading">Stats</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-card__value" id="stat-total">—</span>
+                            <span class="stat-card__label">Total Benches</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-card__value" id="stat-covered">—</span>
+                            <span class="stat-card__label">Covered</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-card__value" id="stat-backrest">—</span>
+                            <span class="stat-card__label">With Backrest</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </aside>
+
+        <!-- Map -->
+        <div class="map-container" id="map">
+            <!-- Placement hint banner (shown when Add Bench is active) -->
+            <div class="map-hint" id="map-hint" style="display:none;">
+                <span class="map-hint__text">Click on the map to place a bench</span>
+                <button class="map-hint__cancel" id="map-hint-cancel">&times;</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bench submission modal -->
+    <div class="modal-overlay" id="bench-modal" style="display:none;">
+        <div class="modal">
+            <div class="modal__header">
+                <h2 class="modal__title">Add a Bench</h2>
+                <button class="modal__close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="modal__hint" id="modal-hint">Click on the map to place the bench, then fill in the details.</p>
+                <form id="bench-form">
+                    <div class="form-group">
+                        <label class="form-label" for="bench-name">Name (optional)</label>
+                        <input type="text" class="form-input" id="bench-name" placeholder="e.g. Park entrance bench">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="bench-material">Material</label>
+                            <select class="form-select" id="bench-material">
+                                <option value="">Unknown</option>
+                                <option value="wood">Wood</option>
+                                <option value="metal">Metal</option>
+                                <option value="stone">Stone</option>
+                                <option value="plastic">Plastic</option>
+                                <option value="concrete">Concrete</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="bench-seats">Seats</label>
+                            <select class="form-select" id="bench-seats">
+                                <option value="">Unknown</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4+</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" id="bench-backrest"> Has backrest
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" id="bench-covered"> Covered / sheltered
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="bench-notes">Notes (optional)</label>
+                        <textarea class="form-textarea" id="bench-notes" rows="2" placeholder="e.g. Near the fountain, shaded area"></textarea>
+                    </div>
+                    <input type="hidden" id="bench-lat">
+                    <input type="hidden" id="bench-lon">
+                </form>
+            </div>
+            <div class="modal__footer">
+                <button class="btn btn--secondary" id="modal-cancel">Cancel</button>
+                <button class="btn btn--primary" id="modal-submit" disabled>Submit Bench</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Data from <a href="https://www.openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a> contributors</p>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+
+    <!-- Leaflet MarkerCluster JS -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+    <!-- App JS -->
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/geolocation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

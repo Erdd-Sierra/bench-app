@@ -1,0 +1,170 @@
+/* === Map Container === */
+.map-container {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+/* === Custom Bench Marker === */
+.bench-marker {
+    background: none;
+    border: none;
+}
+
+.bench-marker img {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    transition: transform var(--transition);
+}
+
+.bench-marker:hover img {
+    transform: scale(1.15);
+}
+
+/* === Marker Cluster Styles === */
+.marker-cluster {
+    background: rgba(42, 157, 143, 0.2);
+    border-radius: 50%;
+}
+
+.marker-cluster div {
+    background: var(--color-primary);
+    color: #fff;
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    width: 36px;
+    height: 36px;
+    margin: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(42, 157, 143, 0.3);
+}
+
+.marker-cluster-small {
+    background: rgba(42, 157, 143, 0.15);
+}
+
+.marker-cluster-small div {
+    width: 32px;
+    height: 32px;
+    margin: 4px;
+}
+
+.marker-cluster-medium {
+    background: rgba(42, 157, 143, 0.2);
+}
+
+.marker-cluster-medium div {
+    width: 38px;
+    height: 38px;
+    margin: 5px;
+}
+
+.marker-cluster-large {
+    background: rgba(42, 157, 143, 0.25);
+}
+
+.marker-cluster-large div {
+    width: 44px;
+    height: 44px;
+    margin: 6px;
+    font-size: var(--font-size-base);
+}
+
+/* === Popup Styles === */
+.leaflet-popup-content-wrapper {
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 20px var(--color-shadow-lg);
+    padding: 0;
+    overflow: hidden;
+}
+
+.leaflet-popup-content {
+    margin: 0;
+    min-width: 200px;
+}
+
+.leaflet-popup-tip {
+    box-shadow: 0 4px 12px var(--color-shadow);
+}
+
+.bench-popup {
+    padding: 16px;
+    font-family: var(--font-family);
+}
+
+.bench-popup__title {
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bench-popup__title::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--color-primary);
+    border-radius: 50%;
+}
+
+.bench-popup__tags {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.bench-popup__tag {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--font-size-sm);
+    padding: 4px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.bench-popup__tag:last-child {
+    border-bottom: none;
+}
+
+.bench-popup__tag-key {
+    color: var(--color-text-secondary);
+    text-transform: capitalize;
+}
+
+.bench-popup__tag-value {
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+/* === User Location Marker === */
+.user-location-marker {
+    width: 16px;
+    height: 16px;
+    background: #4285F4;
+    border: 3px solid #FFFFFF;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(66, 133, 244, 0.4);
+}
+
+.user-location-pulse {
+    width: 40px;
+    height: 40px;
+    background: rgba(66, 133, 244, 0.2);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* === Map Attribution === */
+.leaflet-control-attribution {
+    font-family: var(--font-family);
+    font-size: 10px;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(4px);
+}

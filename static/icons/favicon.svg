@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" rx="6" fill="#2A9D8F"/>
+  <g transform="translate(6, 7)" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Seat -->
+    <rect x="2" y="10" width="16" height="2.5" rx="1.2" fill="white"/>
+    <!-- Backrest -->
+    <rect x="2" y="5" width="16" height="2.5" rx="1.2" fill="white"/>
+    <!-- Left leg -->
+    <line x1="4" y1="12.5" x2="3" y2="18"/>
+    <!-- Right leg -->
+    <line x1="16" y1="12.5" x2="17" y2="18"/>
+    <!-- Left arm -->
+    <line x1="1" y1="5" x2="1" y2="12.5"/>
+    <!-- Right arm -->
+    <line x1="19" y1="5" x2="19" y2="12.5"/>
+  </g>
+</svg>
